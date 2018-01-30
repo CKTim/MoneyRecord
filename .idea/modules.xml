@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/MoneyRecord.iml" filepath="$PROJECT_DIR$/MoneyRecord.iml" />
       <module fileurl="file://D:\other\MoneyRecord\MyApplication.iml" filepath="D:\other\MoneyRecord\MyApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://D:\other\MoneyRecord\app\app.iml" filepath="D:\other\MoneyRecord\app\app.iml" />
     </modules>
   </component>
 </project>

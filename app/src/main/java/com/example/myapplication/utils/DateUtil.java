@@ -3,10 +3,6 @@ package com.example.myapplication.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by CXK on 2018/1/28.
- */
-
 public class DateUtil {
 
     static SimpleDateFormat format;

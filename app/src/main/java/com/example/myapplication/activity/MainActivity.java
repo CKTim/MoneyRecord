@@ -1,6 +1,7 @@
 package com.example.myapplication.activity;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,25 +13,42 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.myapplication.MoneyRecordService;
 import com.example.myapplication.R;
 
 import java.util.List;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    //view
     private LinearLayout cotainer;
+    private TextView tvServiceTip;
+    private Button btnLoginOut;
+    private Button btnCloseSerVice;
+
+    private boolean isStop = false;
+
+    //广播
     private LocalBroadcastManager mLocalBroadcastManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         cotainer = findViewById(R.id.cotainer);
+        tvServiceTip = findViewById(R.id.tv_service_tip);
+        btnLoginOut = findViewById(R.id.btn_logout);
+        btnCloseSerVice = findViewById(R.id.btn_closeService);
+        btnLoginOut.setOnClickListener(this);
+        btnCloseSerVice.setOnClickListener(this);
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, new IntentFilter("MoneyRecordService"));
@@ -40,10 +58,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //判断服务是否开启
-        if (!isStartAccessibilityService()) {
+        if (!isAccessibilityServiceEnabled()) {
             jumpToAccessibilitySetting();
-        }else if(!isNotificationListenerEnabled()){
-            openNotificationListenSettings();
+        } else if (!isNotificationListenerEnabled()) {
+            jumpToNotificationListenSetting();
+        }
+
+        //判断服务状态
+        if (isAccessibilityServiceEnabled() && isNotificationListenerEnabled()) {
+            tvServiceTip.setText("服务已经启动,可以正常使用");
         }
     }
 
@@ -62,22 +85,26 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * 重写返回键
-     */
-    @Override
-    public void onBackPressed() {
-//        super.onBackPressed();
-        Intent home = new Intent(Intent.ACTION_MAIN);
-        home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        home.addCategory(Intent.CATEGORY_HOME);
-        startActivity(home);
-    }
 
     /**
-     * 判断AccessibilityService服务是否已经启动
+     * ********************************点击事件****************************************************
      */
-    public boolean isStartAccessibilityService() {
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_logout:
+                break;
+            case R.id.btn_closeService:
+                break;
+        }
+    }
+
+
+    /**
+     * *********************************页面跳转相关**********************************************
+     */
+    //判断AccessibilityService服务是否已经启动
+    public boolean isAccessibilityServiceEnabled() {
         AccessibilityManager am = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
         List<AccessibilityServiceInfo> serviceInfos = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         for (AccessibilityServiceInfo info : serviceInfos) {
@@ -89,17 +116,13 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    /**
-     * 跳转到AccessibilityService设置页面
-     */
+    //跳转到AccessibilityService设置页面
     public void jumpToAccessibilitySetting() {
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
         startActivity(intent);
     }
 
-    /**
-     * 判断NotificationListener服务是否已经启动
-     */
+    //判断NotificationListener服务是否已经启动
     public boolean isNotificationListenerEnabled() {
         Set<String> packageNames = NotificationManagerCompat.getEnabledListenerPackages(this);
         if (packageNames.contains(getPackageName())) {
@@ -108,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void openNotificationListenSettings() {
+    //跳转到NotificationListene设置页面
+    public void jumpToNotificationListenSetting() {
         try {
             Intent intent;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -120,5 +144,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 重写返回键
+     */
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        Intent home = new Intent(Intent.ACTION_MAIN);
+        home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        home.addCategory(Intent.CATEGORY_HOME);
+        startActivity(home);
     }
 }
