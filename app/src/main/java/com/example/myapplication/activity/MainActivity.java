@@ -1,17 +1,17 @@
 package com.example.myapplication.activity;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -19,11 +19,21 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.myapplication.MoneyRecordService;
 import com.example.myapplication.R;
+import com.example.myapplication.bean.PersonPayResultBean;
+import com.example.myapplication.bean.PersonTojsonBean;
+import com.example.myapplication.retrofit.RetrofitBase;
+import com.example.myapplication.utils.SignUtil;
+import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Set;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -37,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //广播
     private LocalBroadcastManager mLocalBroadcastManager;
+
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, new IntentFilter("MoneyRecordService"));
+
+        gson = new Gson();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendData("PS_WX", "100");
+            }
+        },3000);
     }
 
     @Override
@@ -76,14 +97,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onReceive(Context context, Intent intent) {
             String money = intent.getStringExtra("money");
             String time = intent.getStringExtra("time");
-            TextView tv = new TextView(MainActivity.this);
-            tv.setTextSize(14);
-            tv.setTextColor(Color.BLACK);
-            tv.setText(money + "---" + time);
-            Log.e("AAAAA", money + "---" + time);
-            cotainer.addView(tv);
+            String type = intent.getStringExtra("type");
+
+            if(TextUtils.isEmpty(money)){
+                return;
+            }
+
+            //开始上传数据
+            sendData(type, money);
         }
     };
+
+    /**
+     * 开始上传数据
+     */
+    private void sendData(String type, String money) {
+        //封装json
+        PersonTojsonBean mPersonTojsonBean = new PersonTojsonBean();
+        mPersonTojsonBean.setMerNo("QYF201705200001");
+        mPersonTojsonBean.setSubMerNo("QYF201705200001");
+        mPersonTojsonBean.setNetway(type);
+        mPersonTojsonBean.setAmount(money);
+        mPersonTojsonBean.setDeviceCode("001");
+        String sign = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
+        mPersonTojsonBean.setSign(SignUtil.jsonToMd5(sign).toUpperCase());
+        String data = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
+
+        //开始请求
+        Call<PersonPayResultBean> call=RetrofitBase.getService().postPersonPay(data);
+        call.enqueue(new Callback<PersonPayResultBean>() {
+            @Override
+            public void onResponse(Call<PersonPayResultBean> call, Response<PersonPayResultBean> response) {
+                Log.e("dassada",response.body().getMsg());
+            }
+
+            @Override
+            public void onFailure(Call<PersonPayResultBean> call, Throwable t) {
+                Log.e("dassada",t.toString());
+            }
+        });
+    }
 
 
     /**

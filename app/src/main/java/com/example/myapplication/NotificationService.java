@@ -73,6 +73,7 @@ public class NotificationService extends NotificationListenerService {
         Intent intent = new Intent("MoneyRecordService");
         intent.putExtra("money", money);
         intent.putExtra("time", time);
+        intent.putExtra("type", "PS_ZFB");
         LocalBroadcastManager.getInstance(NotificationService.this).sendBroadcast(intent);
     }
 

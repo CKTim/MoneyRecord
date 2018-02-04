@@ -157,6 +157,7 @@ public class MoneyRecordService extends AccessibilityService {
         Intent intent = new Intent("MoneyRecordService");
         intent.putExtra("money", money);
         intent.putExtra("time", time);
+        intent.putExtra("type", "PS_WX");
         LocalBroadcastManager.getInstance(MoneyRecordService.this).sendBroadcast(intent);
     }
 
