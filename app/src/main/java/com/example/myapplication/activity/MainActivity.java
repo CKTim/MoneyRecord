@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPersonTojsonBean.setSubMerNo("QYF201705200001");
         mPersonTojsonBean.setNetway(type);
         mPersonTojsonBean.setAmount(money);
-        mPersonTojsonBean.setDeviceCode("001");
+//        mPersonTojsonBean.setDeviceCode("001");
         String sign = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
         mPersonTojsonBean.setSign(SignUtil.jsonToMd5(sign).toUpperCase());
         String data = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
