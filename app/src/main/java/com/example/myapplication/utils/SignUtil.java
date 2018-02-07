@@ -3,7 +3,6 @@ package com.example.myapplication.utils;
 import java.security.MessageDigest;
 
 public class SignUtil {
-    public static final String KEY = "3FAE198D505B6B14AE9F361EDCBE323C";
 
     public static String getMD5Str(String str) {
         MessageDigest messageDigest = null;
@@ -33,8 +32,8 @@ public class SignUtil {
     }
 
     //sign加密规则，Md5(json+key);
-    public static String jsonToMd5(String json) {
-        String str = getMD5Str(json + KEY);
+    public static String jsonToMd5(String json,String key) {
+        String str = getMD5Str(json + key);
         return str;
     }
 }
