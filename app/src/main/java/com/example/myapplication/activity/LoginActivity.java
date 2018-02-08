@@ -145,7 +145,9 @@ public class LoginActivity extends AppCompatActivity {
         String subMerNo= (String) SPUtil.newInstance().get("subMerNo","");
         String key= (String) SPUtil.newInstance().get("key","");
 
+        Log.e("dasdas","mBroadcastReceiver4");
         if(TextUtils.isEmpty(merNo)||TextUtils.isEmpty(subMerNo)||TextUtils.isEmpty(key)){
+            Log.e("dasdas","mBroadcastReceiver5");
             return;
         }
 
@@ -158,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
         String sign = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
         mPersonTojsonBean.setSign(SignUtil.jsonToMd5(sign,key).toUpperCase());//签名
         String data = gson.toJson(mPersonTojsonBean, PersonTojsonBean.class);
-        Log.e("dada",money);
+        Log.e("dada",money+"---");
 
         //开始请求
         Call<PersonPayResultBean> call= RetrofitBase.getService().postPersonPay(data);

@@ -40,9 +40,12 @@ public class AndroidInterface {
 
                 PersonPaySaveBean mPersonPaySaveBean=gson.fromJson(msg, PersonPaySaveBean.class);
                 if(mPersonPaySaveBean!=null){
+                    Log.e("dasdas",msg+"dasa");
                     SPUtil.newInstance().putAndApply("merNo",mPersonPaySaveBean.getMerNo());
                     SPUtil.newInstance().putAndApply("subMerNo",mPersonPaySaveBean.getSubMerNo());
                     SPUtil.newInstance().putAndApply("key",mPersonPaySaveBean.getKey());
+                }else {
+                    Log.e("dasdas","json null");
                 }
             }
         });
