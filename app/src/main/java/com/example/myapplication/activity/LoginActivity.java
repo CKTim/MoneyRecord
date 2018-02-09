@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.NotificationManagerCompat;
@@ -15,6 +16,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.accessibility.AccessibilityManager;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.example.myapplication.R;
@@ -37,12 +41,18 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
+    //request code
+    private static final int REQUEST_CODE_SELECT_IMAGE=0x11;
+
     private LinearLayout mContainer;
     private AgentWeb mAgentWeb;
 
     //广播
     private LocalBroadcastManager mLocalBroadcastManager;
     private Gson gson;
+
+    //js图片上传
+    private ValueCallback<Uri[]> uploadMessage;
 
 
     @Override
@@ -56,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                 .setAgentWebParent(mContainer, new LinearLayout.LayoutParams(-1, -1))//传入AgentWeb 的父控件 ，如果父控件为 RelativeLayout ， 那么第二参数需要传入 RelativeLayout.LayoutParams ,第一个参数和第二个参数应该对应。
                 .useDefaultIndicator()// 使用默认进度条
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.DERECT)
+                .setWebChromeClient(new MyWebChromeClient())
                 .createAgentWeb()
                 .ready()
                 .go("http://139.199.195.194:9002/person/login.jsp");
@@ -69,6 +80,34 @@ public class LoginActivity extends AppCompatActivity {
         gson = new Gson();
     }
 
+    class MyWebChromeClient extends WebChromeClient {
+        @Override
+        public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+            uploadMessage = filePathCallback;
+            Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            contentSelectionIntent.setType("image/*");
+
+            startActivityForResult(contentSelectionIntent, REQUEST_CODE_SELECT_IMAGE);
+            Log.e("dasdasda","dasdas");
+            return true;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK){
+            if(requestCode==REQUEST_CODE_SELECT_IMAGE){
+                Uri result=data.getData();
+                if (uploadMessage != null) {
+                    uploadMessage.onReceiveValue(new Uri[]{result});
+                    uploadMessage = null;
+                }
+            }
+        }
+    }
+
     /**
      * *********************************生命周期**********************************************
      */
@@ -80,6 +119,10 @@ public class LoginActivity extends AppCompatActivity {
             jumpToAccessibilitySetting();
         } else if (!isNotificationListenerEnabled()) {
             jumpToNotificationListenSetting();
+        }
+
+        if(uploadMessage!=null){
+            uploadMessage.onReceiveValue(null);
         }
         super.onResume();
     }
