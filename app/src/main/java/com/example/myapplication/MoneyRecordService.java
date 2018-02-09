@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 /**
- * 抢红包Service,继承AccessibilityService
+ * 转账记录Service,继承AccessibilityService
  */
 public class MoneyRecordService extends AccessibilityService {
 
@@ -122,7 +122,7 @@ public class MoneyRecordService extends AccessibilityService {
                 this, 0, new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         Notification builder = new Notification.Builder(this).setContentTitle("提示")
-                .setContentText("服务正在运行").setSmallIcon(R.mipmap.ic_launcher).setContentIntent(pendingIntent).build();
+                .setContentText("服务正在运行").setSmallIcon(R.mipmap.logo).setContentIntent(pendingIntent).build();
         startForeground(1, builder);
     }
 
