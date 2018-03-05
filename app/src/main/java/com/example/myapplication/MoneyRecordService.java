@@ -51,7 +51,7 @@ public class MoneyRecordService extends AccessibilityService {
                 for (int i = rootNode.getChildCount() - 1; i >= 0; i--) {
                     if (!TextUtils.isEmpty(rootNode.getChild(i).getText())) {
                         String text = rootNode.getChild(i).getText().toString();
-                        if ("收款金额".equals(text)) {
+                        if (!TextUtils.isEmpty(text)&&text.contains("收款金额")) {
                             String money = rootNode.getChild(i + 1).getText().toString();
                             if (!TextUtils.isEmpty(money)) {
                                 boolean isWeChatNotification = (boolean) SPUtil.newInstance().get("wechat_notification", false);
